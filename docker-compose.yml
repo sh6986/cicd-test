@@ -1,8 +1,12 @@
-version: '3'
+version: '3.8'
 
 services:
-  app:
+  kotlin-spring-boot-app:
+    image: kotlin-spring-boot-app
     build:
       context: .
       dockerfile: Dockerfile
-    image: simple-kotlin-app:latest
+    ports:
+      - "8000:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev

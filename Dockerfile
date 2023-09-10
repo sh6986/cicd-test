@@ -1,14 +1,19 @@
-FROM openjdk:11-jdk-slim
-
-RUN apt-get update && apt-get install -y wget unzip
-RUN wget https://github.com/JetBrains/kotlin/releases/download/v1.5.0/kotlin-compiler-1.5.0.zip
-RUN unzip kotlin-compiler-1.5.0.zip -d /opt
-ENV PATH=$PATH:/opt/kotlinc/bin
+FROM gradle:8.1.1-jdk17 as build
 
 WORKDIR /app
 
-COPY HelloWorld.kt .
+COPY build.gradle.kts settings.gradle.kts ./
 
-RUN kotlinc HelloWorld.kt -include-runtime -d HelloWorld.jar
+RUN gradle build --no-daemon > /dev/null 2>&1 || true
 
-CMD ["java", "-jar", "HelloWorld.jar"]
+COPY src ./src
+
+RUN gradle bootJar --no-daemon
+
+FROM openjdk:17-jdk-slim as package
+
+WORKDIR /app
+
+COPY --from=build /app/build/libs/*.jar app.jar
+
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
