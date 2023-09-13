@@ -7,6 +7,5 @@ import org.springframework.boot.runApplication
 class CicdTestApplication
 
 fun main(args: Array<String>) {
-
 	runApplication<CicdTestApplication>(*args)
 }
